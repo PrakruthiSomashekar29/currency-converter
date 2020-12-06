@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd ">
+    <munit:config name="currency-converter-apikit-test.xml" />
+    <http:request-config name="HTTP_Request_Configuration" basePath="/api">
+        <http:request-connection host="localhost" port="8081" />
+    </http:request-config>
+    <munit:test name="get:\converter\(value)\(from)\(to):currency-converter-config-200-application\json-FlowTest" description="Verifying functionality of [get:\converter\(value)\(from)\(to):currency-converter-config-200-application\json]">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="currency-converter-main" />
+            <munit:enable-flow-source value="get:\converter\(value)\(from)\(to):currency-converter-config" />
+        </munit:enable-flow-sources>
+        <munit:behavior>
+            <set-variable variableName="from" value="#['null']" doc:name="from" />
+            <set-variable variableName="to" value="#['null']" doc:name="to" />
+            <set-variable variableName="value" value="#['null']" doc:name="value" />
+        </munit:behavior>
+        <munit:execution>
+            <http:request config-ref="HTTP_Request_Configuration" method="GET" path="#['/converter/$(vars.value)/$(vars.from)/$(vars.to)']">
+                <http:headers><![CDATA[#[{"Accept":"application/json"}]]]></http:headers>
+                <http:uri-params ><![CDATA[#[output application/java
+---
+{
+	
+	"value" : vars.value,
+	"from" : vars.from,
+	"to" : vars.to
+}]]]></http:uri-params>
+				<http:query-params><![CDATA[#[output application/java
+---
+{
+	"app_id" : p('secure::token.appID')
+}]]]></http:query-params>
+            </http:request>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]" message="The HTTP Status code is not correct!" doc:name="Assert That Status Code is 200" />
+			<munit-tools:assert-that doc:name="Assert that" doc:id="7e1cc056-2bcd-4da1-a7a9-77b22aead5f9" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+        </munit:validation>
+    </munit:test>
+</mule>

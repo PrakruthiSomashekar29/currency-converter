@@ -1,0 +1,10 @@
+request:
+  base: "api"
+  host: "openexchangerates.org"
+  port: "443"
+  path: "latest.json"
+  
+http:
+  port: "8081"  
+
+   

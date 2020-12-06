@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub" xmlns:automationanywhere="http://www.mulesoft.org/schema/mule/automationanywhere"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/automationanywhere http://www.mulesoft.org/schema/mule/automationanywhere/current/mule-automationanywhere.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd">
+	<flow name="currency-converter-flow" doc:id="e6a1f4b5-c99f-4f90-89e6-ea05fc4fbe30" >
+		<ee:transform doc:name="Transform Message" doc:id="061eed90-c0e1-4d81-8c86-e5caff5709cb" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="toTarget" ><![CDATA[%dw 2.0
+output text/plain
+---
+message.attributes.uriParams.to as String default "INR"
+]]></ee:set-variable>
+				<ee:set-variable variableName="amount" ><![CDATA[%dw 2.0
+output text/plain
+---
+message.attributes.uriParams.value as Number default 30]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value='${secure::token.appID}' doc:name="Set Variable" doc:id="692869fd-14ce-4076-a662-a93b5d2cfdbf" variableName="token"/>
+		<http:request method="GET" doc:name="Calling external API openexchangerates" doc:id="2d8f9bfb-9565-4605-9c9c-31d01e8f4beb" config-ref="HTTP_Request_configuration" path="${request.path}">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"app_id" : vars.token
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Calculates the required currency by  taking toTarget and amount values" doc:id="08e21384-af47-44e8-b60b-bec2254c9f0f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+"Converted amount": (payload.rates[vars.toTarget] as Number) * (vars.amount as Number),
+"Rate": payload.rates[vars.toTarget] as Number
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

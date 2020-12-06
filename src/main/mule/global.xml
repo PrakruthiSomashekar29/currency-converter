@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="b492801a-a0ea-4b5b-b681-f045f05c7f4a" basePath="${request.base}">
+		<http:request-connection host="${request.host}" protocol="HTTPS" port="${request.port}"/>
+	</http:request-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="63857d42-fa5e-4b1f-8625-6ad77a3f29b4" file="config.yaml" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="0e6f42f4-f006-4acd-8c56-55389cf29f82" file="properties.yaml" key="Prakruthishekar1"/>
+	<http:listener-config name="HTTP_Listener_config2" doc:name="HTTP Listener config" doc:id="f160988a-0bf0-4a35-99af-f17e12266e4f" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config>
+	<configuration doc:name="Configuration" doc:id="36413d4f-34b7-466d-a36d-ce4fc8896cbc" defaultErrorHandler-ref="globalError_Handler" />
+	<cloudhub:config name="CloudHub_Config" doc:name="CloudHub Config" doc:id="97b578b7-011e-42bf-acb6-8076c7e0144f" >
+		<cloudhub:connection username="Prakruthi_Shekar" password="Dreamcatcher@1997" environment="bc58f615-e0e4-4061-b765-0d258dcfc93c" />
+	</cloudhub:config>
+	<error-handler name="globalError_Handler" doc:id="4c7b2d30-91d3-4b7a-af95-d2df239f07cc" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d6933784-b43e-4314-8690-bdd48cef21ce" type="ANY">
+			<logger level="ERROR" doc:name="Logger" doc:id="c9553f44-8f7b-4395-bfc3-d45cbd192d8c" message="#[payload]"/>
+			<ee:transform doc:name="Transform Message" doc:id="3dfebca9-15f9-450a-b853-645f67cb4a05" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+error.errorType.identifier]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<choice doc:name="Choice" doc:id="db8c171b-a3e1-4772-a27c-c912db42003b" >
+				<when expression='#[error.errorType.identifier == "METHOD_NOT_ALLOWED"]'>
+					<cloudhub:create-notification doc:name="Copy_of_Copy_of_Copy_of_Create Notification" doc:id="9ac33e08-5129-4446-8e79-ae574501cf39" config-ref="CloudHub_Config" domain="currency-pss">
+						<cloudhub:message><![CDATA[#['Error description:' ++ error.description ++ '\nError Type:' ++ error.errorType.identifier]]]></cloudhub:message>
+					</cloudhub:create-notification>
+					<ee:transform doc:name="Copy_of_Copy_of_Transform Message" doc:id="ebf8feed-485d-4517-be95-c532bed33680">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{ "error description" : error.description,
+	"error type": error.errorType.identifier
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</when>
+				<otherwise >
+					<ee:transform doc:name="Transform Message" doc:id="3a610490-ad45-4ace-8c12-143bd3f0f18c" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	message: "It's just me error",
+	error: error.errorType.identifier
+    
+	
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</otherwise>
+			</choice>
+		</on-error-propagate>
+	</error-handler>
+
+</mule>
