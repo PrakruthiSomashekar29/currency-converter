@@ -23,15 +23,15 @@
 		  <plugin>
 			    <groupId>org.mule.tools.maven</groupId>
 			    <artifactId>mule-maven-plugin</artifactId>
-			    <version>3.3.5</version>
+			    <version>3.6.3</version>
 			    <extensions>true</extensions>
 			    <configuration>
 			        <cloudHubDeployment>
 			            <uri>https://anypoint.mulesoft.com</uri>
 			            <muleVersion>4.2.2</muleVersion>
-			            <username>mulepoc</username>
-			            <password>*******</password>
-			            <applicationName>mulesoft-cicd-sample1</applicationName>
+			            <username>Prakruthi_Shekar</username>
+			            <password>Dreamcatcher@1997</password>
+			            <applicationName>mulesoft-cicd-currency-converter</applicationName>
 			            <environment>Sandbox</environment>
 			            <workerType>MICRO</workerType>
 			            <objectStoreV2>true</objectStoreV2>
