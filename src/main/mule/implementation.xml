@@ -7,7 +7,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/automationanywhere http://www.mulesoft.org/schema/mule/automationanywhere/current/mule-automationanywhere.xsd
 http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd">
-	<flow name="currency-converter-flow" doc:id="e6a1f4b5-c99f-4f90-89e6-ea05fc4fbe30" >
+	<flow name="currency-converter-flow-1" doc:id="e6a1f4b5-c99f-4f90-89e6-ea05fc4fbe30" >
 		<ee:transform doc:name="Transform Message" doc:id="061eed90-c0e1-4d81-8c86-e5caff5709cb" >
 			<ee:message >
 			</ee:message>
