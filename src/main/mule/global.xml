@@ -24,7 +24,7 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
 	</cloudhub:config>
 	<error-handler name="globalError_Handler" doc:id="4c7b2d30-91d3-4b7a-af95-d2df239f07cc" >
 		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d6933784-b43e-4314-8690-bdd48cef21ce" type="ANY">
-			<logger level="ERROR" doc:name="Logger" doc:id="c9553f44-8f7b-4395-bfc3-d45cbd192d8c" message="#[payload]"/>
+			<logger level="ERROR" doc:name="Loggger" doc:id="c9553f44-8f7b-4395-bfc3-d45cbd192d8c" message="#[payload]"/>
 			<ee:transform doc:name="Transform Message" doc:id="3dfebca9-15f9-450a-b853-645f67cb4a05" >
 				<ee:message >
 					<ee:set-payload ><![CDATA[%dw 2.0
